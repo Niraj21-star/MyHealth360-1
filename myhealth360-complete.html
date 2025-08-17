@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyHealth360</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 0;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: none;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #333;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #667eea;
+        }
+
+        /* App Container */
+        .app-container {
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Auth Pages Styles */
+        .auth-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .auth-page.active {
+            display: flex;
+        }
+
+        .auth-form {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+            margin: 20px;
+        }
+
+        .auth-form h2 {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #333;
+        }
+
+        /* Main App Pages */
+        .main-page {
+            display: none;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding-top: 80px;
+        }
+
+        .main-page.active {
+            display: block;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #f8f9fa;
+            color: #333;
+            border: 2px solid #e1e1e1;
+        }
+
+        .auth-switch {
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .auth-switch a {
+            color: #667eea;
+            text-decoration: none;
+        }
+
+        /* Dashboard */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .widget {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .widget:hover {
+            transform: translateY(-5px);
+        }
+
+        .widget h3 {
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .counter {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .counter-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .counter-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* Weather Alerts */
+        .weather-alert {
+            background: linear-gradient(135deg, #ff6b6b, #feca57);
+            color: white;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            animation: pulse 2s infinite;
+        }
+
+        .weather-alert.critical {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            animation: flash 1s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes flash {
+            0%, 50% { opacity: 1; }
+            25%, 75% { opacity: 0.7; }
+        }
+
+        /* Diet Planner */
+        .diet-section {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .meal-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid #667eea;
+        }
+
+        .macro-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .macro-item {
+            text-align: center;
+            padding: 1rem;
+            background: #667eea;
+            color: white;
+            border-radius: 10px;
+        }
+
+        /* Chat Interface */
+        .chat-container {
+            background: white;
+            border-radius: 15px;
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 15px;
+            max-width: 70%;
+            word-wrap: break-word;
+        }
+
+        .message.user {
+            background: #667eea;
+            color: white;
+            margin-left: auto;
+        }
+
+        .message.bot {
+            background: white;
+            border: 1px solid #e1e1e1;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 1rem;
+            border-top: 1px solid #e1e1e1;
+            background: white;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid #e1e1e1;
+            border-radius: 25px;
+            margin-right: 0.5rem;
+        }
+
+        .chat-input button {
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Doctor Cards */
+        .doctors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .doctor-card {
+            background: white;
+            border-radius: 15px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .doctor-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .doctor-info h3 {
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .specialty {
+            color: #667eea;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+
+        .availability {
+            background: #e8f5e8;
+            color: #2d5a2d;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+
+        /* Appointments */
+        .appointment-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid #667eea;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        /* Profile */
+        .profile-container {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            max-width: 600px;
+            margin: 2rem auto;
+        }
+
+        /* Reminders */
+        .reminder-item {
+            background: white;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 0.25rem 0.75rem;
+            cursor: pointer;
+        }
+
+        /* Success/Error Messages */
+        .message-popup {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            color: white;
+            font-weight: bold;
+            z-index: 10001;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .message-popup.success {
+            background: #28a745;
+        }
+
+        .message-popup.error {
+            background: #dc3545;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Loading */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .doctors-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Navigation -->
+        <nav class="navbar" id="navbar">
+            <div class="nav-container">
+                <div class="logo">MyHealth360</div>
+                <ul class="nav-links">
+                    <li><a href="#" onclick="showPage('dashboard')">Dashboard</a></li>
+                    <li><a href="#" onclick="showPage('chat')">AI Assistant</a></li>
+                    <li><a href="#" onclick="showPage('diet')">Diet Planner</a></li>
+                    <li><a href="#" onclick="showPage('doctors')">Doctors</a></li>
+                    <li><a href="#" onclick="showPage('reminders')">Reminders</a></li>
+                    <li><a href="#" onclick="showPage('profile')">Profile</a></li>
+                    <li><a href="#" onclick="logout()">Logout</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Login Page -->
+        <div id="login" class="auth-page active">
+            <form class="auth-form" onsubmit="login(event)">
+                <h2>Welcome Back</h2>
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn">Login</button>
+                <div class="auth-switch">
+                    Don't have an account? <a href="#" onclick="showPage('signup')">Sign up</a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Signup Page -->
+        <div id="signup" class="auth-page">
+            <form class="auth-form" onsubmit="signup(event)">
+                <h2>Join MyHealth360</h2>
+                <div class="form-group">
+                    <label for="signupName">Full Name</label>
+                    <input type="text" id="signupName" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupEmail">Email</label>
+                    <input type="email" id="signupEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupAge">Age</label>
+                    <input type="number" id="signupAge" required min="1" max="120">
+                </div>
+                <div class="form-group">
+                    <label for="signupGender">Gender</label>
+                    <select id="signupGender" required>
+                        <option value="">Select Gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" required>
+                </div>
+                <button type="submit" class="btn">Sign Up</button>
+                <div class="auth-switch">
+                    Already have an account? <a href="#" onclick="showPage('login')">Login</a>
+                </div>
+            </form>
+        </div>
+
+        <!-- Dashboard Page -->
+        <div id="dashboard" class="main-page">
+            <div class="container">
+                <div id="weatherAlerts"></div>
+                <h1 style="color: white; margin-bottom: 2rem;">Health Dashboard</h1>
+                <div class="dashboard-grid">
+                    <!-- Steps Widget -->
+                    <div class="widget">
+                        <h3>Daily Steps</h3>
+                        <div class="form-group">
+                            <input type="number" id="stepsInput" placeholder="Enter steps" min="0">
+                            <button class="btn" onclick="updateSteps()" style="margin-top: 0.5rem;">Update Steps</button>
+                        </div>
+                        <div class="counter-value" style="margin-top: 1rem;">Steps: <span id="stepsCount">0</span></div>
+                    </div>
+
+                    <!-- Sleep Widget -->
+                    <div class="widget">
+                        <h3>Sleep Hours</h3>
+                        <div class="form-group">
+                            <input type="number" id="sleepInput" placeholder="Hours slept" min="0" max="24" step="0.5">
+                            <button class="btn" onclick="updateSleep()" style="margin-top: 0.5rem;">Update Sleep</button>
+                        </div>
+                        <div class="counter-value" style="margin-top: 1rem;">Hours: <span id="sleepCount">0</span></div>
+                    </div>
+
+                    <!-- Water Widget -->
+                    <div class="widget">
+                        <h3>Water Intake</h3>
+                        <div class="counter">
+                            <button class="counter-btn" onclick="changeWater(-1)">-</button>
+                            <div class="counter-value"><span id="waterCount">0</span> glasses</div>
+                            <button class="counter-btn" onclick="changeWater(1)">+</button>
+                        </div>
+                    </div>
+
+                    <!-- Medicine Reminders -->
+                    <div class="widget">
+                        <h3>🔔 Smart Pill Reminders</h3>
+                        <div class="form-group">
+                            <input type="text" id="pillName" placeholder="Medicine name (e.g., Vitamin D)">
+                        </div>
+                        <div class="form-group">
+                            <input type="time" id="pillTime" placeholder="Reminder time">
+                        </div>
+                        <div class="form-group">
+                            <select id="pillFrequency">
+                                <option value="daily">Daily</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="custom">Custom</option>
+                            </select>
+                        </div>
+                        <button class="btn" onclick="addPillReminder()">Set Reminder</button>
+                        <div id="activePillReminders" style="margin-top: 1rem;"></div>
+                    </div>
+
+                    <!-- AI Assistant -->
+                    <div class="widget">
+                        <h3>AI Health Assistant</h3>
+                        <p>Get instant health guidance and tips from our AI assistant.</p>
+                        <button class="btn" onclick="showPage('chat')" style="margin-top: 1rem;">Chat Now</button>
+                    </div>
+
+                    <!-- Doctor Consultation -->
+                    <div class="widget">
+                        <h3>Doctor Consultation</h3>
+                        <p>Book appointments with qualified doctors.</p>
+                        <button class="btn" onclick="showPage('doctors')" style="margin-top: 1rem;">Find Doctors</button>
+                    </div>
+
+                    <!-- Diet Planner Widget -->
+                    <div class="widget">
+                        <h3>🍎 AI Diet Planner</h3>
+                        <p>Get personalized meal plans based on your health goals.</p>
+                        <button class="btn" onclick="showPage('diet')" style="margin-top: 1rem;">Plan My Diet</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chat Page -->
+        <div id="chat" class="main-page">
+            <div class="container">
+                <h1 style="color: white; margin-bottom: 2rem;">AI Health Assistant</h1>
+                <div class="chat-container">
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="message bot">
+                            <strong>⚠️ This is not medical advice. Please consult a doctor for any medical concerns.</strong><br><br>
+                            Hello! I'm your AI Health Assistant. How can I help you today?
+                        </div>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" id="chatInput" placeholder="Ask me anything about health..." onkeypress="handleChatKeypress(event)">
+                        <button onclick="sendMessage()">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Diet Planner Page -->
+        <div id="diet" class="main-page">
+            <div class="container">
+                <h1 style="color: white; margin-bottom: 2rem;">🍎 AI Diet Planner</h1>
+                
+                <div class="diet-section">
+                    <h3>Tell us about your goals</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem;">
+                        <div class="form-group">
+                            <label for="dietGoal">Health Goal</label>
+                            <select id="dietGoal">
+                                <option value="weight_loss">Weight Loss</option>
+                                <option value="weight_gain">Weight Gain</option>
+                                <option value="muscle_gain">Muscle Gain</option>
+                                <option value="maintenance">Maintenance</option>
+                                <option value="diabetes">Diabetes Management</option>
+                                <option value="heart_health">Heart Health</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="dietType">Diet Preference</label>
+                            <select id="dietType">
+                                <option value="balanced">Balanced</option>
+                                <option value="vegetarian">Vegetarian</option>
+                                <option value="vegan">Vegan</option>
+                                <option value="keto">Keto</option>
+                                <option value="mediterranean">Mediterranean</option>
+                                <option value="low_carb">Low Carb</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="activityLevel">Activity Level</label>
+                            <select id="activityLevel">
+                                <option value="sedentary">Sedentary</option>
+                                <option value="light">Light Exercise</option>
+                                <option value="moderate">Moderate Exercise</option>
+                                <option value="active">Very Active</option>
+                                <option value="extra_active">Extra Active</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button class="btn" onclick="generateDietPlan()" style="margin-top: 1rem;">Generate My Diet Plan</button>
+                </div>
+
+                <div id="dietPlanResults" style="display: none;">
+                    <div class="diet-section">
+                        <h3>Your Personalized Meal Plan</h3>
+                        <div class="macro-stats" id="macroStats"></div>
+                    </div>
+
+                    <div class="diet-section">
+                        <h3>Today's Meals</h3>
+                        <div id="mealPlan"></div>
+                    </div>
+
+                    <div class="diet-section">
+                        <h3>💡 Smart Recommendations</h3>
+                        <div id="dietTips"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Doctors Page -->
+        <div id="doctors" class="main-page">
+            <div class="container">
+                <h1 style="color: white; margin-bottom: 2rem;">Find Doctors</h1>
+                <div class="doctors-grid" id="doctorsGrid"></div>
+                
+                <div style="margin-top: 3rem;">
+                    <h2 style="color: white; margin-bottom: 1rem;">My Appointments</h2>
+                    <div id="appointmentsList"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reminders Page -->
+        <div id="reminders" class="main-page">
+            <div class="container">
+                <h1 style="color: white; margin-bottom: 2rem;">Reminders</h1>
+                <div class="widget" style="margin-bottom: 2rem;">
+                    <h3>Add New Reminder</h3>
+                    <div class="form-group">
+                        <label for="reminderType">Type</label>
+                        <select id="reminderType">
+                            <option value="medicine">Medicine</option>
+                            <option value="water">Water</option>
+                            <option value="exercise">Exercise</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="reminderText">Reminder</label>
+                        <input type="text" id="reminderText" placeholder="Enter reminder text" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="reminderTime">Time</label>
+                        <input type="time" id="reminderTime" required>
+                    </div>
+                    <button class="btn" onclick="addReminder()">Add Reminder</button>
+                </div>
+                
+                <div id="remindersList"></div>
+            </div>
+        </div>
+
+        <!-- Profile Page -->
+        <div id="profile" class="main-page">
+            <div class="container">
+                <div class="profile-container">
+                    <h2 style="text-align: center; margin-bottom: 2rem;">My Profile</h2>
+                    <form onsubmit="updateProfile(event)">
+                        <div class="form-group">
+                            <label for="profileName">Full Name</label>
+                            <input type="text" id="profileName" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="profileEmail">Email</label>
+                            <input type="email" id="profileEmail" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="profileAge">Age</label>
+                            <input type="number" id="profileAge" required min="1" max="120">
+                        </div>
+                        <div class="form-group">
+                            <label for="profileGender">Gender</label>
+                            <select id="profileGender" required>
+                                <option value="male">Male</option>
+                                <option value="female">Female</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn">Update Profile</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // In-memory storage
+        let storage = {
+            currentUser: null,
+            users: {
+                // Demo user for testing
+                'demo@test.com': {
+                    name: 'Demo User',
+                    email: 'demo@test.com',
+                    password: 'password',
+                    age: 30,
+                    gender: 'male'
+                }
+            },
+            healthData: {},
+            appointments: [],
+            reminders: [],
+            pillReminders: [],
+            dietPlans: {},
+            weatherAlerts: []
+        };
+
+        // Utility functions
+        function showMessage(message, type = 'success') {
+            const popup = document.createElement('div');
+            popup.className = `message-popup ${type}`;
+            popup.textContent = message;
+            document.body.appendChild(popup);
+            
+            setTimeout(() => {
+                popup.remove();
+            }, 3000);
+        }
+
+        // Page navigation
+        function showPage(pageId) {
+            // Hide ALL auth pages
+            const authPages = document.querySelectorAll('.auth-page');
+            authPages.forEach(page => page.classList.remove('active'));
+
+            // Hide ALL main pages
+            const mainPages = document.querySelectorAll('.main-page');
+            mainPages.forEach(page => page.classList.remove('active'));
+
+            // Handle navbar visibility
+            const navbar = document.getElementById('navbar');
+            if (pageId === 'login' || pageId === 'signup') {
+                navbar.style.display = 'none';
+                document.getElementById(pageId).classList.add('active');
+            } else {
+                navbar.style.display = 'block';
+                document.getElementById(pageId).classList.add('active');
+                
+                // Load page-specific data
+                if (pageId === 'dashboard') {
+                    loadDashboard();
+                } else if (pageId === 'doctors') {
+                    loadDoctors();
+                } else if (pageId === 'reminders') {
+                    loadReminders();
+                } else if (pageId === 'profile') {
+                    loadProfile();
+                }
+            }
+        }
+
+        // Authentication functions
+        function login(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            // Check if user exists and password matches
+            const user = storage.users[email];
+            if (user && user.password === password) {
+                storage.currentUser = user;
+                showMessage('Login successful!');
+                showPage('dashboard');
+            } else {
+                showMessage('Invalid email or password!', 'error');
+            }
+        }
+
+        function signup(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const age = document.getElementById('signupAge').value;
+            const gender = document.getElementById('signupGender').value;
+            const password = document.getElementById('signupPassword').value;
+            
+            // Check if user already exists
+            if (storage.users[email]) {
+                showMessage('User already exists!', 'error');
+                return;
+            }
+            
+            // Create new user
+            storage.users[email] = {
+                name: name,
+                email: email,
+                age: parseInt(age),
+                gender: gender,
+                password: password
+            };
+            
+            storage.currentUser = storage.users[email];
+            showMessage('Account created successfully!');
+            showPage('dashboard');
+        }
+
+        function logout() {
+            storage.currentUser = null;
+            showMessage('Logged out successfully!');
+            showPage('login');
+        }
+
+        // Dashboard functions
+        function loadDashboard() {
+            if (!storage.currentUser) return;
+            
+            const userEmail = storage.currentUser.email;
+            const healthData = storage.healthData[userEmail] || {
+                steps: 0,
+                sleep: 0,
+                water: 0
+            };
+            
+            document.getElementById('stepsCount').textContent = healthData.steps;
+            document.getElementById('sleepCount').textContent = healthData.sleep;
+            document.getElementById('waterCount').textContent = healthData.water;
+            
+            loadPillReminders();
+            checkWeatherAlerts();
+        }
+
+        function updateSteps() {
+            const steps = parseInt(document.getElementById('stepsInput').value) || 0;
+            if (!storage.currentUser) return;
+            
+            const userEmail = storage.currentUser.email;
+            if (!storage.healthData[userEmail]) {
+                storage.healthData[userEmail] = {};
+            }
+            
+            storage.healthData[userEmail].steps = steps;
+            document.getElementById('stepsCount').textContent = steps;
+            document.getElementById('stepsInput').value = '';
+            showMessage('Steps updated!');
+        }
+
+        function updateSleep() {
+            const sleep = parseFloat(document.getElementById('sleepInput').value) || 0;
+            if (!storage.currentUser) return;
+            
+            const userEmail = storage.currentUser.email;
+            if (!storage.healthData[userEmail]) {
+                storage.healthData[userEmail] = {};
+            }
+            
+            storage.healthData[userEmail].sleep = sleep;
+            document.getElementById('sleepCount').textContent = sleep;
+            document.getElementById('sleepInput').value = '';
+            showMessage('Sleep hours updated!');
+        }
+
+        function changeWater(change) {
+            if (!storage.currentUser) return;
+            
+            const userEmail = storage.currentUser.email;
+            if (!storage.healthData[userEmail]) {
+                storage.healthData[userEmail] = { water: 0 };
+            }
+            
+            storage.healthData[userEmail].water = Math.max(0, (storage.healthData[userEmail].water || 0) + change);
+            document.getElementById('waterCount').textContent = storage.healthData[userEmail].water;
+            
+            if (change > 0) {
+                showMessage('Water intake increased!');
+            }
+        }
+
+        // Pill reminder functions
+        function addPillReminder() {
+            const name = document.getElementById('pillName').value;
+            const time = document.getElementById('pillTime').value;
+            const frequency = document.getElementById('pillFrequency').value;
+            
+            if (!name || !time) {
+                showMessage('Please fill in all fields!', 'error');
+                return;
+            }
+            
+            const reminder = {
+                id: Date.now(),
+                name: name,
+                time: time,
+                frequency: frequency,
+                userEmail: storage.currentUser.email
+            };
+            
+            storage.pillReminders.push(reminder);
+            loadPillReminders();
+            
+            // Clear inputs
+            document.getElementById('pillName').value = '';
+            document.getElementById('pillTime').value = '';
+            
+            showMessage('Pill reminder added!');
+        }
+
+        function loadPillReminders() {
+            if (!storage.currentUser) return;
+            
+            const userReminders = storage.pillReminders.filter(r => r.userEmail === storage.currentUser.email);
+            const container = document.getElementById('activePillReminders');
+            
+            if (userReminders.length === 0) {
+                container.innerHTML = '<p style="color: #666;">No reminders set</p>';
+                return;
+            }
+            
+            container.innerHTML = userReminders.map(reminder => `
+                <div style="background: #f8f9fa; padding: 0.5rem; border-radius: 5px; margin: 0.5rem 0; display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <strong>${reminder.name}</strong><br>
+                        <small>${reminder.time} - ${reminder.frequency}</small>
+                    </div>
+                    <button onclick="deletePillReminder(${reminder.id})" style="background: #dc3545; color: white; border: none; border-radius: 3px; padding: 0.25rem 0.5rem; cursor: pointer;">Delete</button>
+                </div>
+            `).join('');
+        }
+
+        function deletePillReminder(id) {
+            storage.pillReminders = storage.pillReminders.filter(r => r.id !== id);
+            loadPillReminders();
+            showMessage('Reminder deleted!');
+        }
+
+        // Weather alerts function
+        function checkWeatherAlerts() {
+            const alerts = [
+                { type: 'warning', message: '🌡️ High temperature expected today. Stay hydrated!' },
+                { type: 'info', message: '🌧️ Rain expected. Perfect day for indoor workouts!' }
+            ];
+            
+            const container = document.getElementById('weatherAlerts');
+            container.innerHTML = alerts.map(alert => `
+                <div class="weather-alert">
+                    <strong>${alert.message}</strong>
+                </div>
+            `).join('');
+        }
+
+        // Chat functions
+        function handleChatKeypress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (!message) return;
+            
+            const messagesContainer = document.getElementById('chatMessages');
+            
+            // Add user message
+            messagesContainer.innerHTML += `
+                <div class="message user">
+                    ${message}
+                </div>
+            `;
+            
+            input.value = '';
+            
+            // Add bot response
+            setTimeout(() => {
+                const response = generateHealthResponse(message);
+                messagesContainer.innerHTML += `
+                    <div class="message bot">
+                        ${response}
+                    </div>
+                `;
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }, 1000);
+            
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function generateHealthResponse(message) {
+            const responses = {
+                'headache': '💊 For headaches, try: 1) Stay hydrated 2) Get adequate rest 3) Reduce screen time 4) Consider mild pain relief. If persistent, consult a doctor.',
+                'exercise': '🏃‍♂️ Great question! Aim for 150 minutes of moderate exercise weekly. Start with 30-minute walks and gradually increase intensity.',
+                'diet': '🥗 A balanced diet includes: fruits, vegetables, lean proteins, whole grains, and healthy fats. Limit processed foods and sugar.',
+                'sleep': '😴 Quality sleep tips: 7-9 hours nightly, consistent bedtime, cool dark room, no screens before bed, limit caffeine.',
+                'stress': '🧘‍♀️ Manage stress with: deep breathing, meditation, regular exercise, proper sleep, and talking to friends or professionals.',
+                'water': '💧 Drink 8-10 glasses of water daily. Increase intake during exercise or hot weather.'
+            };
+            
+            const lowerMessage = message.toLowerCase();
+            
+            for (const [key, response] of Object.entries(responses)) {
+                if (lowerMessage.includes(key)) {
+                    return response;
+                }
+            }
+            
+            return "🤖 I'm here to help with general health information. For specific medical concerns, please consult with a healthcare professional. Try asking about headaches, exercise, diet, sleep, stress, or water intake!";
+        }
+
+        // Diet planner functions
+        function generateDietPlan() {
+            const goal = document.getElementById('dietGoal').value;
+            const type = document.getElementById('dietType').value;
+            const activity = document.getElementById('activityLevel').value;
+            
+            // Show results section
+            document.getElementById('dietPlanResults').style.display = 'block';
+            
+            // Generate macro stats
+            const macros = generateMacros(goal, activity);
+            document.getElementById('macroStats').innerHTML = `
+                <div class="macro-item">
+                    <div style="font-size: 1.5rem; font-weight: bold;">${macros.calories}</div>
+                    <div>Calories</div>
+                </div>
+                <div class="macro-item">
+                    <div style="font-size: 1.5rem; font-weight: bold;">${macros.protein}g</div>
+                    <div>Protein</div>
+                </div>
+                <div class="macro-item">
+                    <div style="font-size: 1.5rem; font-weight: bold;">${macros.carbs}g</div>
+                    <div>Carbs</div>
+                </div>
+                <div class="macro-item">
+                    <div style="font-size: 1.5rem; font-weight: bold;">${macros.fats}g</div>
+                    <div>Fats</div>
+                </div>
+            `;
+            
+            // Generate meal plan
+            const meals = generateMeals(type, goal);
+            document.getElementById('mealPlan').innerHTML = meals.map(meal => `
+                <div class="meal-card">
+                    <h4>${meal.name}</h4>
+                    <p>${meal.description}</p>
+                    <small><strong>Calories:</strong> ${meal.calories} | <strong>Protein:</strong> ${meal.protein}g</small>
+                </div>
+            `).join('');
+            
+            // Generate tips
+            const tips = generateDietTips(goal, type);
+            document.getElementById('dietTips').innerHTML = tips.map(tip => `
+                <p style="margin-bottom: 1rem;">• ${tip}</p>
+            `).join('');
+            
+            showMessage('Diet plan generated!');
+        }
+
+        function generateMacros(goal, activity) {
+            const baseCals = activity === 'sedentary' ? 1800 : activity === 'light' ? 2000 : activity === 'moderate' ? 2200 : activity === 'active' ? 2400 : 2600;
+            const calories = goal === 'weight_loss' ? baseCals - 500 : goal === 'weight_gain' ? baseCals + 500 : baseCals;
+            
+            return {
+                calories: calories,
+                protein: Math.round(calories * 0.25 / 4),
+                carbs: Math.round(calories * 0.45 / 4),
+                fats: Math.round(calories * 0.30 / 9)
+            };
+        }
+
+        function generateMeals(type, goal) {
+            const mealOptions = {
+                vegetarian: [
+                    { name: 'Breakfast', description: 'Greek yogurt with berries and granola', calories: 350, protein: 20 },
+                    { name: 'Lunch', description: 'Quinoa Buddha bowl with roasted vegetables', calories: 450, protein: 15 },
+                    { name: 'Dinner', description: 'Lentil curry with brown rice and vegetables', calories: 500, protein: 25 },
+                    { name: 'Snack', description: 'Hummus with whole grain crackers', calories: 200, protein: 8 }
+                ],
+                balanced: [
+                    { name: 'Breakfast', description: 'Oatmeal with banana and almonds', calories: 400, protein: 12 },
+                    { name: 'Lunch', description: 'Grilled chicken salad with mixed greens', calories: 450, protein: 35 },
+                    { name: 'Dinner', description: 'Baked salmon with quinoa and steamed broccoli', calories: 550, protein: 40 },
+                    { name: 'Snack', description: 'Apple with almond butter', calories: 180, protein: 6 }
+                ]
+            };
+            
+            return mealOptions[type] || mealOptions.balanced;
+        }
+
+        function generateDietTips(goal, type) {
+            const tips = {
+                weight_loss: [
+                    'Create a moderate calorie deficit of 300-500 calories per day',
+                    'Focus on protein-rich foods to maintain muscle mass',
+                    'Stay hydrated - drink water before meals',
+                    'Include fiber-rich foods to stay full longer'
+                ],
+                muscle_gain: [
+                    'Consume protein within 30 minutes after workouts',
+                    'Eat frequent, smaller meals throughout the day',
+                    'Include complex carbohydrates for energy',
+                    'Don\'t forget healthy fats for hormone production'
+                ]
+            };
+            
+            return tips[goal] || [
+                'Eat a variety of colorful fruits and vegetables',
+                'Choose whole grains over refined grains',
+                'Limit processed foods and added sugars',
+                'Practice portion control and mindful eating'
+            ];
+        }
+
+        // Doctors functions
+        function loadDoctors() {
+            const doctors = [
+                {
+                    name: 'Dr. Sarah Johnson',
+                    specialty: 'General Medicine',
+                    availability: 'Available Today',
+                    rating: 4.8,
+                    experience: '15 years'
+                },
+                {
+                    name: 'Dr. Michael Chen',
+                    specialty: 'Cardiology',
+                    availability: 'Next Available: Tomorrow',
+                    rating: 4.9,
+                    experience: '20 years'
+                },
+                {
+                    name: 'Dr. Emily Rodriguez',
+                    specialty: 'Dermatology',
+                    availability: 'Available Today',
+                    rating: 4.7,
+                    experience: '12 years'
+                },
+                {
+                    name: 'Dr. James Wilson',
+                    specialty: 'Orthopedics',
+                    availability: 'Next Available: Monday',
+                    rating: 4.6,
+                    experience: '18 years'
+                }
+            ];
+            
+            const container = document.getElementById('doctorsGrid');
+            container.innerHTML = doctors.map(doctor => `
+                <div class="doctor-card">
+                    <div class="doctor-info">
+                        <h3>${doctor.name}</h3>
+                        <div class="specialty">${doctor.specialty}</div>
+                        <div class="availability">${doctor.availability}</div>
+                        <p><strong>Experience:</strong> ${doctor.experience}</p>
+                        <p><strong>Rating:</strong> ⭐ ${doctor.rating}/5.0</p>
+                        <button class="btn" onclick="bookAppointment('${doctor.name}', '${doctor.specialty}')" style="margin-top: 1rem;">Book Appointment</button>
+                    </div>
+                </div>
+            `).join('');
+            
+            loadAppointments();
+        }
+
+        function bookAppointment(doctorName, specialty) {
+            const appointment = {
+                id: Date.now(),
+                doctor: doctorName,
+                specialty: specialty,
+                date: new Date(Date.now() + Math.random() * 7 * 24 * 60 * 60 * 1000).toLocaleDateString(),
+                time: ['9:00 AM', '10:30 AM', '2:00 PM', '3:30 PM'][Math.floor(Math.random() * 4)],
+                userEmail: storage.currentUser.email
+            };
+            
+            storage.appointments.push(appointment);
+            loadAppointments();
+            showMessage('Appointment booked successfully!');
+        }
+
+        function loadAppointments() {
+            if (!storage.currentUser) return;
+            
+            const userAppointments = storage.appointments.filter(a => a.userEmail === storage.currentUser.email);
+            const container = document.getElementById('appointmentsList');
+            
+            if (userAppointments.length === 0) {
+                container.innerHTML = '<p style="color: white;">No appointments scheduled.</p>';
+                return;
+            }
+            
+            container.innerHTML = userAppointments.map(apt => `
+                <div class="appointment-card">
+                    <h4>${apt.doctor}</h4>
+                    <p><strong>Specialty:</strong> ${apt.specialty}</p>
+                    <p><strong>Date:</strong> ${apt.date}</p>
+                    <p><strong>Time:</strong> ${apt.time}</p>
+                    <button onclick="cancelAppointment(${apt.id})" style="background: #dc3545; color: white; border: none; border-radius: 5px; padding: 0.5rem 1rem; cursor: pointer; margin-top: 0.5rem;">Cancel</button>
+                </div>
+            `).join('');
+        }
+
+        function cancelAppointment(id) {
+            storage.appointments = storage.appointments.filter(a => a.id !== id);
+            loadAppointments();
+            showMessage('Appointment cancelled.');
+        }
+
+        // Reminders functions
+        function addReminder() {
+            const type = document.getElementById('reminderType').value;
+            const text = document.getElementById('reminderText').value;
+            const time = document.getElementById('reminderTime').value;
+            
+            if (!text || !time) {
+                showMessage('Please fill in all fields!', 'error');
+                return;
+            }
+            
+            const reminder = {
+                id: Date.now(),
+                type: type,
+                text: text,
+                time: time,
+                userEmail: storage.currentUser.email
+            };
+            
+            storage.reminders.push(reminder);
+            loadReminders();
+            
+            // Clear inputs
+            document.getElementById('reminderText').value = '';
+            document.getElementById('reminderTime').value = '';
+            
+            showMessage('Reminder added!');
+        }
+
+        function loadReminders() {
+            if (!storage.currentUser) return;
+            
+            const userReminders = storage.reminders.filter(r => r.userEmail === storage.currentUser.email);
+            const container = document.getElementById('remindersList');
+            
+            if (userReminders.length === 0) {
+                container.innerHTML = '<p style="color: white;">No reminders set.</p>';
+                return;
+            }
+            
+            container.innerHTML = userReminders.map(reminder => `
+                <div class="reminder-item">
+                    <div>
+                        <h4>${reminder.text}</h4>
+                        <p><strong>Type:</strong> ${reminder.type.charAt(0).toUpperCase() + reminder.type.slice(1)}</p>
+                        <p><strong>Time:</strong> ${reminder.time}</p>
+                    </div>
+                    <button class="delete-btn" onclick="deleteReminder(${reminder.id})">Delete</button>
+                </div>
+            `).join('');
+        }
+
+        function deleteReminder(id) {
+            storage.reminders = storage.reminders.filter(r => r.id !== id);
+            loadReminders();
+            showMessage('Reminder deleted!');
+        }
+
+        // Profile functions
+        function loadProfile() {
+            if (!storage.currentUser) return;
+            
+            const user = storage.currentUser;
+            document.getElementById('profileName').value = user.name;
+            document.getElementById('profileEmail').value = user.email;
+            document.getElementById('profileAge').value = user.age;
+            document.getElementById('profileGender').value = user.gender;
+        }
+
+        function updateProfile(event) {
+            event.preventDefault();
+            
+            if (!storage.currentUser) return;
+            
+            const name = document.getElementById('profileName').value;
+            const email = document.getElementById('profileEmail').value;
+            const age = document.getElementById('profileAge').value;
+            const gender = document.getElementById('profileGender').value;
+            
+            // Update user data
+            storage.currentUser.name = name;
+            storage.currentUser.age = parseInt(age);
+            storage.currentUser.gender = gender;
+            
+            // Update in users storage
+            storage.users[email] = storage.currentUser;
+            
+            showMessage('Profile updated successfully!');
+        }
+
+        // Initialize app
+        window.onload = function() {
+            // Check if user is logged in
+            if (storage.currentUser) {
+                showPage('dashboard');
+            } else {
+                showPage('login');
+            }
+        };
+    </script>
+</body>
+</html>
